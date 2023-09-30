@@ -1,4 +1,0 @@
-CREATE EXTERNAL DATA SOURCE files
-WITH (
-    LOCATION = 'https://mydatalake.blob.core.windows.net/data/files/'
-);

@@ -1,0 +1,14 @@
+bikes_df = spark.sql("SELECT ProductID, ProductName, ListPrice \
+                      FROM products \
+                      WHERE Category IN ('Mountain Bikes', 'Road Bikes')")
+display(bikes_df)
+
+
+-------------IN A NOTEBOOK------------
+
+%%sql
+
+SELECT Category, COUNT(ProductID) AS ProductCount
+FROM products
+GROUP BY Category
+ORDER BY Category

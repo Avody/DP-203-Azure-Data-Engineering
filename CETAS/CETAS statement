@@ -1,0 +1,19 @@
+CREATE EXTERNAL TABLE SpecialOrders
+    WITH (
+        -- details for storing results
+        LOCATION = 'special_orders/',
+        DATA_SOURCE = files,
+        FILE_FORMAT = ParquetFormat
+    )
+AS
+SELECT OrderID, CustomerName, OrderTotal
+FROM
+    OPENROWSET(
+        -- details for reading source files
+        BULK 'sales_orders/*.csv',
+        DATA_SOURCE = 'files',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW = TRUE
+    ) AS source_data
+WHERE OrderType = 'Special Order';

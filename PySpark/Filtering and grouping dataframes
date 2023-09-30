@@ -1,0 +1,7 @@
+pricelist_df = df.select("ProductID", "ListPrice")
+----
+bikes_df = df.select("ProductName", "ListPrice").where((df["Category"]=="Mountain Bikes") | (df["Category"]=="Road Bikes"))
+display(bikes_df)
+----
+counts_df = df.select("ProductID", "Category").groupBy("Category").count()
+display(counts_df)

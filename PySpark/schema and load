@@ -1,0 +1,15 @@
+from pyspark.sql.types import *
+from pyspark.sql.functions import *
+
+productSchema = StructType([
+    StructField("ProductID", IntegerType()),
+    StructField("ProductName", StringType()),
+    StructField("Category", StringType()),
+    StructField("ListPrice", FloatType())
+    ])
+
+df = spark.read.load('abfss://container@store.dfs.core.windows.net/product-data.csv',
+    format='csv',
+    schema=productSchema,
+    header=False)
+display(df.limit(10))

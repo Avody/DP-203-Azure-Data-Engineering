@@ -1,0 +1,15 @@
+-------Creating a Delta Lake table from a dataframe--------
+
+# Load a file into a dataframe
+df = spark.read.load('/data/mydata.csv', format='csv', header=True)
+
+# Save the dataframe as a delta table
+delta_table_path = "/delta/mydata"
+df.write.format("delta").save(delta_table_path)
+
+
+--- replace existing  Delta Lake table ---
+new_df.write.format("delta").mode("overwrite").save(delta_table_path)
+
+--- add rows to delta lake ---
+new_rows_df.write.format("delta").mode("append").save(delta_table_path)

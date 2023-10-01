@@ -1,0 +1,10 @@
+from pyspark.sql.functions import year, col
+
+# Load source data
+df = spark.read.csv('/orders/*.csv', header=True, inferSchema=True)
+
+# Add Year column
+dated_df = df.withColumn("Year", year(col("OrderDate")))
+
+# Partition by year
+dated_df.write.partitionBy("Year").mode("overwrite").parquet("/data")

@@ -8,3 +8,8 @@ dated_df = df.withColumn("Year", year(col("OrderDate")))
 
 # Partition by year
 dated_df.write.partitionBy("Year").mode("overwrite").parquet("/data")
+
+----Filter parquet files in a query----
+
+orders_2020 = spark.read.parquet('/partitioned_data/Year=2020')
+display(orders_2020.limit(5))

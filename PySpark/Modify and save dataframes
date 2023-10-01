@@ -1,0 +1,21 @@
+order_details = spark.read.csv('/orders/*.csv', header=True, inferSchema=True)
+
+
+------------Transform the data structure-----------------
+from pyspark.sql.functions import split, col
+
+# Create the new FirstName and LastName fields
+transformed_df = order_details.withColumn("FirstName", split(col("CustomerName"), " ").getItem(0)).withColumn("LastName", split(col("CustomerName"), " ").getItem(1))
+
+# Remove the CustomerName field
+transformed_df = transformed_df.drop("CustomerName")
+
+display(transformed_df.limit(5))
+
+
+
+
+----------------------Save the transformed data------------
+
+transformed_df.write.mode("overwrite").parquet('/transformed_data/orders.parquet')
+print ("Transformed data saved!")

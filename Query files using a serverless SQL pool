@@ -1,4 +1,0 @@
-SELECT TOP 100 *
-FROM OPENROWSET(
-    BULK 'https://mydatalake.blob.core.windows.net/data/files/*.csv',
-    FORMAT = 'csv') AS rows

@@ -1,0 +1,76 @@
+---- LOAD DATA IN A DATAFRAME ----
+
+%%pyspark
+df = spark.read.load('abfss://files@datalakexxxxxxx.dfs.core.windows.net/products/products.csv', format='csv'
+## If header exists uncomment line below
+, header=True
+)
+
+
+
+---- LOAD THE FILE DATA INTO A DELTA LAKE ----
+
+ delta_table_path = "/delta/products-delta"
+ df.write.format("delta").save(delta_table_path) ## take df and write it, in a delta format, at the path delta_table_path
+
+
+---- UPDATE SOME VALUES ----
+
+ from delta.tables import *
+ from pyspark.sql.functions import *
+
+ # Create a deltaTable object
+ deltaTable = DeltaTable.forPath(spark, delta_table_path)
+
+ # Update the table (reduce price of product 771 by 10%)
+ deltaTable.update(
+     condition = "ProductID == 771",
+     set = { "ListPrice": "ListPrice * 0.9" })
+
+ # View the updated data as a dataframe
+ deltaTable.toDF().show(10)
+
+
+---- DELTA LAKE STORAGE KEEPS A LOG FILE THAT CONTAINS, AMONG OTHERS, ALL THE PREVIOUS VERSIONS OF CHANGES THAT HAVE OCCURED ON DATA----
+--- PICK A PREVIOUS VERSION OF MY DATA ---
+
+ new_df = spark.read.format("delta").option("versionAsOf", 0).load(delta_table_path)
+ new_df.show(10)
+
+--- SEE THE VERSIONS ---
+ deltaTable.history(10).show(20, False, True) ## last 10 versions, 20 rows of each version history
+
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
+
+---- CREATE CATALOG TABLES ----
+
+--- EXTERNAL TABLE ---
+ spark.sql("CREATE DATABASE AdventureWorks")
+ spark.sql("CREATE TABLE AdventureWorks.ProductsExternal USING DELTA LOCATION '{0}'".format(delta_table_path))
+ spark.sql("DESCRIBE EXTENDED AdventureWorks.ProductsExternal").show(truncate=False)
+
+-- QUERY FROM EXTERNALTABLE --
+
+ %%sql
+
+ USE AdventureWorks;
+
+ SELECT * FROM ProductsExternal;
+
+--- MANAGED TABLE ---
+
+ df.write.format("delta").saveAsTable("AdventureWorks.ProductsManaged")
+ spark.sql("DESCRIBE EXTENDED AdventureWorks.ProductsManaged").show(truncate=False)
+
+-- QUERY --
+ %%sql
+
+ USE AdventureWorks;
+
+ SHOW TABLES;
+
+
+

@@ -1,3 +1,4 @@
+-------------------------------------------------------STEP 1---------------------------------------------
 -- Monitor active queries
 SELECT *
 FROM sys.dm_pdw_exec_requests
@@ -25,3 +26,40 @@ SELECT  *
 FROM    sys.dm_pdw_exec_requests
 WHERE   [label] = 'My Query';
 
+-------------------------------------------------------STEP 2---------------------------------------------
+
+
+-- Find the distributed query plan steps for a specific query.
+-- Replace request_id with value from Step 1.
+
+SELECT * FROM sys.dm_pdw_request_steps
+WHERE request_id = 'QID####'
+ORDER BY step_index;
+
+-------------------------------------------------------STEP 3---------------------------------------------
+
+-- Find the distribution run times for a SQL step.
+-- Replace request_id and step_index with values from Step 1 and 3.
+
+SELECT * FROM sys.dm_pdw_sql_requests
+WHERE request_id = 'QID####' AND step_index = 2;
+
+
+-- Find the SQL Server execution plan for a query running on a specific SQL pool or control node.
+-- Replace distribution_id and spid with values from previous query.
+
+DBCC PDW_SHOWEXECUTIONPLAN(1, 78);
+
+-------------------------------------------------------STEP 4---------------------------------------------
+
+-- Find information about all the workers completing a Data Movement Step.
+-- Replace request_id and step_index with values from Step 1 and 3.
+
+SELECT * FROM sys.dm_pdw_dms_workers
+WHERE request_id = 'QID####' AND step_index = 2;
+
+
+-- Find the SQL Server estimated plan for a query running on a specific SQL pool Compute or control node.
+-- Replace distribution_id and spid with values from previous query.
+
+DBCC PDW_SHOWEXECUTIONPLAN(55, 238);
